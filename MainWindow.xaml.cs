@@ -213,12 +213,11 @@ namespace OreCalc
                     resultPrice = result.appraisal.totals.buy.ToString("N");
                     tbPrice.Text = resultPrice;
                     System.Windows.Clipboard.SetDataObject(resultPrice);
-                    Visibility = Visibility.Hidden;
+                    Visibility = Visibility.Visible;
                     UpdateLayout();
                     Rect desktopWorkingArea = SystemParameters.WorkArea;
                     Left = desktopWorkingArea.Right - Width;
                     Top = desktopWorkingArea.Bottom - Height;
-                    Visibility = Visibility.Visible;
                     Slide(true);
                     Task.Delay(4000).ContinueWith(_ =>
                     {
