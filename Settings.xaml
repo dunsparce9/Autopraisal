@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Autopraisal"
         mc:Ignorable="d"
-        Title="Settings" Height="450" Width="800">
+        Title="Settings - Autopraisal" Height="211" Width="288" Background="#FF212121">
     <Grid>
-        
+        <StackPanel Margin="10,10,10,10">
+            <TextBlock Text="Monitoring" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold"/>
+            <CheckBox IsChecked="True" Content="Only appraise if EVE is in the foreground" Foreground="White" Margin="0,6,0,0"/>
+            <TextBlock Text="Appraisals" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold" Margin="0,16,0,0"/>
+            <WrapPanel Margin="0,6,0,0">
+                <TextBlock Text="Market:" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox SelectedIndex="0">
+                    <ComboBoxItem Content="Jita"/>
+                </ComboBox>
+                <TextBlock Text="Percentage:" Foreground="White" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                <TextBox Width="40" Text="100" VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
+                <TextBlock Text="%" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0"/>
+            </WrapPanel>
+            <CheckBox Content="Compress asteroids and ice" Foreground="White" Margin="0,8,0,0"/>
+            <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,20,0,0">
+                <Button Content="Cancel" Height="25" Width="62" Margin="0,0,5,0"/>
+                <Button Content="Save" Width="48" FontWeight="Bold"/>
+            </WrapPanel>
+        </StackPanel>
     </Grid>
 </Window>
