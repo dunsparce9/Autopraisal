@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autopraisal", "Autopraisal.csproj", "{A36651A0-4F56-4CC8-A347-EB6A6A5ACC95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A36651A0-4F56-4CC8-A347-EB6A6A5ACC95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A36651A0-4F56-4CC8-A347-EB6A6A5ACC95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A36651A0-4F56-4CC8-A347-EB6A6A5ACC95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A36651A0-4F56-4CC8-A347-EB6A6A5ACC95}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E3042173-0A38-41EC-8933-357C6E681CEA}
+	EndGlobalSection
+EndGlobal
