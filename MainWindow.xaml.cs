@@ -1,5 +1,4 @@
-﻿using Autopraisal;
-using Autopraisal.Models;
+﻿using Autopraisal.Models;
 using OreCalc.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
-namespace OreCalc
+namespace Autopraisal
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
