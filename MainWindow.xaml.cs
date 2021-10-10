@@ -113,6 +113,8 @@ namespace OreCalc
         ThicknessAnimation slide = new ThicknessAnimation();
         bool SlidingDown = false;
         NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
+        private string resultPrice;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -147,6 +149,7 @@ namespace OreCalc
 
         void OnClipboardUpdate()
         {
+            if (Clipboard.GetText() == resultPrice) return;
             Process p = GetActiveProcess();
             if (p.ProcessName == "exefile" && p.MainWindowTitle.StartsWith("EVE - "))
             {
@@ -163,8 +166,9 @@ namespace OreCalc
                 {
                     tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
                     var result = Appraise(Clipboard.GetText());
-                    tbPrice.Text = String.Format(result.appraisal.totals.buy.ToString("N"));
-                    Clipboard.SetText(result.appraisal.totals.buy.ToString("N"));
+                    resultPrice = result.appraisal.totals.buy.ToString("N");
+                    tbPrice.Text = resultPrice;
+                    Clipboard.SetDataObject(resultPrice);
                     Visibility = Visibility.Hidden;
                     UpdateLayout();
                     Rect desktopWorkingArea = SystemParameters.WorkArea;
@@ -187,7 +191,7 @@ namespace OreCalc
                 httpWebRequest.UserAgent = "Autopraisal/0.0.1a (github.com/dunsparce9/autopraisal)";
                 outgoingQueryString.Add("market", "jita");
                 outgoingQueryString.Add("price_percentage", "90");
-                outgoingQueryString.Set("raw_textarea", Clipboard.GetText());
+                outgoingQueryString.Set("raw_textarea", clipboardText);
                 string postdata = outgoingQueryString.ToString();
                 using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                 {
