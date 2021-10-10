@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -110,6 +111,16 @@ namespace Autopraisal
         #endregion
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         List<EveItem> items = new List<EveItem>();
+        string AppraisalCache = "";
+        List<string> ores = new List<string>{
+            "Arkonor","Bezdacine","Bistot","Crokite","Dark Ochre","Gneiss",
+            "Hedbergite","Hemorphite","Jaspet", "Kernite", "Mercoxit", "Omber",
+            "Plagioclase", "Pyroxeres", "Rakovene","Scordite","Spodumain","Talassonite","Veldspar",
+        };
+        List<string> ice = new List<string>
+        {
+            "Blue Ice","Clear Icicle","Dark Glitter","Gelidus","Glacial Mass","Glare Crust","Krystallos","White Glaze"
+        };
         Regex itemName = new Regex(@"[^\t]*");
         Regex itemQty = new Regex(@"\t\d{1,3}(\.\d{1,3})?(\.\d{1,3})?");
         Storyboard sb = new Storyboard();
@@ -125,7 +136,7 @@ namespace Autopraisal
         public MainWindow()
         {
             InitializeComponent();
-
+            
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 
             enabled.Checked = true;
@@ -154,7 +165,7 @@ namespace Autopraisal
 
         private void Settings_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            new Settings().ShowDialog();
         }
 
         private void Enabled_Click(object sender, EventArgs e)
@@ -194,21 +205,40 @@ namespace Autopraisal
             string clipboardText = System.Windows.Clipboard.GetText();
             if (clipboardText == resultPrice) return;
             Process p = GetActiveProcess();
-            if (p.ProcessName == "exefile" && p.MainWindowTitle.StartsWith("EVE - "))
+            bool isEve = p.ProcessName == "exefile" && p.MainWindowTitle.StartsWith("EVE - ");
+            if (!Properties.Settings.Default.CheckForEve | isEve)
             {
                 items.Clear();
+                AppraisalCache = "";
                 using (StringReader reader = new StringReader(clipboardText))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        items.Add(new EveItem(itemName.Match(line).Value, itemQty.Match(line).Value.Trim()));
+                        string name = itemName.Match(line).Value;
+                        int qty = int.Parse(itemQty.Match(line).Value.Trim());
+                        if (Properties.Settings.Default.CompressOres)
+                        {
+                            if (ores.Any(s => name.EndsWith(s)) && qty / 100 >= 1)
+                            {
+                                Regex r = new Regex(name);
+                                name = "Compressed " + name;
+                                qty /= 100;
+                            }
+                            if (ice.Any(s => name.EndsWith(s)))
+                            {
+                                Regex r = new Regex(name);
+                                name = "Compressed " + name;
+                            }
+                        }
+                        items.Add(new EveItem(name, qty.ToString()));
+                        AppraisalCache += name + "\t" + qty + "\n";
                     }
                 }
                 if (items.Count > 0)
                 {
                     tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
-                    var result = Appraise(clipboardText);
+                    var result = Appraise(AppraisalCache);
                     resultPrice = result.appraisal.totals.buy.ToString("N");
                     tbPrice.Text = resultPrice;
                     System.Windows.Clipboard.SetDataObject(resultPrice);
@@ -230,7 +260,7 @@ namespace Autopraisal
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://evepraisal.com/appraisal.json?persist=no");
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";
                 httpWebRequest.Method = "POST";
-                httpWebRequest.UserAgent = "Autopraisal/0.0.1a (github.com/dunsparce9/autopraisal)";
+                httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
                 outgoingQueryString.Add("market", "jita");
                 outgoingQueryString.Add("price_percentage", "90");
                 outgoingQueryString.Set("raw_textarea", clipboardText);

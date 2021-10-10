@@ -19,9 +19,25 @@ namespace Autopraisal
     /// </summary>
     public partial class Settings : Window
     {
+        public List<string> markets { get; set; } = new List<string> { "Jita", "Perimeter", "Universe", "Amarr", "Dodixie", "Hek", "Rens" };
         public Settings()
         {
             InitializeComponent();
+            Rect desktopWorkingArea = SystemParameters.WorkArea;
+            Left = desktopWorkingArea.Right - Width;
+            Top = desktopWorkingArea.Bottom - Height;
+            DataContext = this;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+            Close();
         }
     }
 }
