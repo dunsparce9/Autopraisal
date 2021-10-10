@@ -262,7 +262,7 @@ namespace Autopraisal
                 httpWebRequest.Method = "POST";
                 httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
                 outgoingQueryString.Add("market", "jita");
-                outgoingQueryString.Add("price_percentage", "90");
+                outgoingQueryString.Add("price_percentage", Properties.Settings.Default.Percentage.ToString());
                 outgoingQueryString.Set("raw_textarea", clipboardText);
                 string postdata = outgoingQueryString.ToString();
                 using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
