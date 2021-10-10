@@ -164,6 +164,7 @@ namespace OreCalc
                     tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
                     var result = Appraise(Clipboard.GetText());
                     tbPrice.Text = String.Format(result.appraisal.totals.buy.ToString("N"));
+                    Clipboard.SetText(result.appraisal.totals.buy.ToString("N"));
                     Visibility = Visibility.Hidden;
                     UpdateLayout();
                     Rect desktopWorkingArea = SystemParameters.WorkArea;
