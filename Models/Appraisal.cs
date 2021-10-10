@@ -8,13 +8,16 @@ namespace Autopraisal.Models
 {
     class Appraisal
     {
-        public string market = "jita";
-        public string raw_textarea = "";
-
-        public Appraisal(string market, string raw_textarea)
-        {
-            this.market = market;
-            this.raw_textarea = raw_textarea;
-        }
+        public long created { get; set; }
+        public string kind { get; set; }
+        public string market_name { get; set; }
+        public AppraisalTotals totals { get; set; }
     }
+
+    class AppraisalTotals
+    {
+        public decimal buy { get; set; }
+        public decimal sell { get; set; }
+    }
+
 }
