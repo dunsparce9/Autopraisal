@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -15,9 +16,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace OreCalc
 {
@@ -106,6 +109,7 @@ namespace OreCalc
             return Process.GetProcessById((int)pid);
         }
         #endregion
+        private System.Windows.Forms.NotifyIcon notifyIcon = null;
         List<EveItem> items = new List<EveItem>();
         Regex itemName = new Regex(@"[^\t]*");
         Regex itemQty = new Regex(@"\t\d{1,3}(\.\d{1,3})?(\.\d{1,3})?");
@@ -114,11 +118,27 @@ namespace OreCalc
         bool SlidingDown = false;
         NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
         private string resultPrice;
+        ContextMenuStrip contextMenu = new ContextMenuStrip();
+        ToolStripMenuItem enabled = new ToolStripMenuItem("Monitoring enabled");
+        ToolStripMenuItem settings = new ToolStripMenuItem("Settings");
+        ToolStripMenuItem exit = new ToolStripMenuItem("Exit");
 
         public MainWindow()
         {
             InitializeComponent();
+
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+
+            enabled.Checked = true;
+            enabled.Click += Enabled_Click;
+            settings.Click += Settings_Click;
+            exit.Click += Exit_Click;
+            contextMenu.Items.Add(enabled);
+            contextMenu.Items.Add(settings);
+            contextMenu.Items.Add(exit);
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.ContextMenuStrip = contextMenu;
+            notifyIcon.Icon = Autopraisal.Properties.Resources.Wallet;
 
             slide.BeginTime = new TimeSpan(0);
             slide.SetValue(Storyboard.TargetProperty, mainGrid);
@@ -131,6 +151,29 @@ namespace OreCalc
             sb.Children.Add(slide);
             sb.Completed += Sb_Completed;
 
+        }
+
+        private void Settings_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Enabled_Click(object sender, EventArgs e)
+        {
+            enabled.Checked = !enabled.Checked;
+            if (enabled.Checked)
+            {
+                Start();
+            }
+            else
+            {
+                Stop();
+            }
+        }
+
+        private void Exit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void Sb_Completed(object sender, EventArgs e)
@@ -149,12 +192,13 @@ namespace OreCalc
 
         void OnClipboardUpdate()
         {
-            if (Clipboard.GetText() == resultPrice) return;
+            string clipboardText = System.Windows.Clipboard.GetText();
+            if (clipboardText == resultPrice) return;
             Process p = GetActiveProcess();
             if (p.ProcessName == "exefile" && p.MainWindowTitle.StartsWith("EVE - "))
             {
                 items.Clear();
-                using (StringReader reader = new StringReader(Clipboard.GetText()))
+                using (StringReader reader = new StringReader(clipboardText))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
@@ -165,10 +209,10 @@ namespace OreCalc
                 if (items.Count > 0)
                 {
                     tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
-                    var result = Appraise(Clipboard.GetText());
+                    var result = Appraise(clipboardText);
                     resultPrice = result.appraisal.totals.buy.ToString("N");
                     tbPrice.Text = resultPrice;
-                    Clipboard.SetDataObject(resultPrice);
+                    System.Windows.Clipboard.SetDataObject(resultPrice);
                     Visibility = Visibility.Hidden;
                     UpdateLayout();
                     Rect desktopWorkingArea = SystemParameters.WorkArea;
@@ -228,6 +272,11 @@ namespace OreCalc
                 }
             }
 
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            notifyIcon.Visible = true;
         }
     }
 }
