@@ -124,7 +124,7 @@ namespace OreCalc
 
             slide.From = new Thickness(0, 25, 0, 0);
             slide.To = new Thickness(0, 0, 0, 0);
-            slide.Duration = new Duration(TimeSpan.FromSeconds(0.4));
+            slide.Duration = new Duration(TimeSpan.FromSeconds(0.2));
 
             sb.Children.Add(slide);
             sb.Completed += Sb_Completed;
@@ -171,7 +171,7 @@ namespace OreCalc
                     Top = desktopWorkingArea.Bottom - Height;
                     Visibility = Visibility.Visible;
                     Slide(true);
-                    Task.Delay(2000).ContinueWith(_ =>
+                    Task.Delay(4000).ContinueWith(_ =>
                     {
                         Slide(false);
                     });
