@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -255,7 +255,7 @@ namespace Autopraisal
                 }
             }
 
-            Result Appraise(string clipboardText)
+            Result Appraise(string text)
             {
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://evepraisal.com/appraisal.json?persist=no");
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";
@@ -263,7 +263,7 @@ namespace Autopraisal
                 httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
                 outgoingQueryString.Add("market", "jita");
                 outgoingQueryString.Add("price_percentage", Properties.Settings.Default.Percentage.ToString());
-                outgoingQueryString.Set("raw_textarea", clipboardText);
+                outgoingQueryString.Set("raw_textarea", text);
                 string postdata = outgoingQueryString.ToString();
                 using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                 {
@@ -273,7 +273,7 @@ namespace Autopraisal
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     string response = streamReader.ReadToEnd();
-                    return JsonSerializer.Deserialize<Result>(response);
+                    return JsonConvert.DeserializeObject<Result>(response);
                 }
             }
 

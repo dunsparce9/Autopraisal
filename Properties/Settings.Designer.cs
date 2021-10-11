@@ -25,18 +25,6 @@ namespace Autopraisal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool CompressOres {
-            get {
-                return ((bool)(this["CompressOres"]));
-            }
-            set {
-                this["CompressOres"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CheckForEve {
             get {
@@ -49,6 +37,30 @@ namespace Autopraisal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CompressOres {
+            get {
+                return ((bool)(this["CompressOres"]));
+            }
+            set {
+                this["CompressOres"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int Percentage {
+            get {
+                return ((int)(this["Percentage"]));
+            }
+            set {
+                this["Percentage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int Market {
             get {
@@ -56,18 +68,6 @@ namespace Autopraisal.Properties {
             }
             set {
                 this["Market"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("90")]
-        public int Percentage {
-            get {
-                return ((int)(this["Percentage"]));
-            }
-            set {
-                this["Percentage"] = value;
             }
         }
         

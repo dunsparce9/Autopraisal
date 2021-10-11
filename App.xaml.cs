@@ -9,7 +9,7 @@ using System.Windows;
 namespace Autopraisal
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// App.xaml etkileşim mantığı
     /// </summary>
     public partial class App : Application
     {
