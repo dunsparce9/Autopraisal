@@ -7,12 +7,12 @@ using System.Windows;
 // Bir bütünleştirilmiş koda ilişkin Genel Bilgiler aşağıdaki öznitelikler kümesiyle
 // denetlenir. Bütünleştirilmiş kod ile ilişkili bilgileri değiştirmek için
 // bu öznitelik değerlerini değiştirin.
-[assembly: AssemblyTitle("Autopraisal")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Clipboard appraisal utility for EVE Online mining fleets")]
+[assembly: AssemblyDescription("Clipboard appraisal utility for EVE Online mining fleets")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Faceless Empire")]
 [assembly: AssemblyProduct("Autopraisal")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyCopyright("Copyright © Faceless Empire 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
