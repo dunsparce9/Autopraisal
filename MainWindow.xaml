@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:OreCalc"
+        xmlns:local="clr-namespace:Autopraisal"
         mc:Ignorable="d"
         Title="MainWindow" Loaded="Window_Loaded" ShowInTaskbar="False" AllowsTransparency="True" Background="Transparent" Visibility="Collapsed" Topmost="True" Height="25" ResizeMode="NoResize" WindowStyle="None"  SizeToContent="Width">
     <Grid x:Name="mainGrid" Height="25" Background="Black" Margin="0,25,0,0">
