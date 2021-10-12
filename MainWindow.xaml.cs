@@ -121,6 +121,7 @@ namespace Autopraisal
         {
             "Blue Ice","Clear Icicle","Dark Glitter","Gelidus","Glacial Mass","Glare Crust","Krystallos","White Glaze"
         };
+        List<string> markets = new List<string> { "Jita", "Perimeter", "Universe", "Amarr", "Dodixie", "Hek", "Rens" };
         Regex itemName = new Regex(@"[^\t]*");
         Regex itemQty = new Regex(@"\t\d{1,3}(\.\d{1,3})?(\.\d{1,3})?");
         Storyboard sb = new Storyboard();
@@ -136,7 +137,7 @@ namespace Autopraisal
         public MainWindow()
         {
             InitializeComponent();
-            
+
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 
             enabled.Checked = true;
@@ -239,7 +240,14 @@ namespace Autopraisal
                 {
                     tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
                     var result = Appraise(AppraisalCache);
-                    resultPrice = result.appraisal.totals.buy.ToString("N");
+                    if (Properties.Settings.Default.Price == 0)
+                    {
+                        resultPrice = result.appraisal.totals.buy.ToString("N");
+                    }
+                    else
+                    {
+                        resultPrice = result.appraisal.totals.sell.ToString("N");
+                    }
                     tbPrice.Text = resultPrice;
                     System.Windows.Clipboard.SetDataObject(resultPrice);
                     Visibility = Visibility.Visible;
@@ -261,7 +269,8 @@ namespace Autopraisal
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";
                 httpWebRequest.Method = "POST";
                 httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
-                outgoingQueryString.Add("market", "jita");
+                outgoingQueryString.Clear();
+                outgoingQueryString.Add("market", markets[Properties.Settings.Default.Market].ToLowerInvariant());
                 outgoingQueryString.Add("price_percentage", Properties.Settings.Default.Percentage.ToString());
                 outgoingQueryString.Set("raw_textarea", text);
                 string postdata = outgoingQueryString.ToString();
