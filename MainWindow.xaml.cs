@@ -201,6 +201,7 @@ namespace Autopraisal
         {
             enabled.Checked = !enabled.Checked;
             Properties.Settings.Default.MonitoringEnabled = enabled.Checked;
+            Properties.Settings.Default.Save();
             UpdateMonitoring();
         }
 
