@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Autopraisal"
         xmlns:properties="clr-namespace:Autopraisal.Properties"
         mc:Ignorable="d"
-        Title="Settings - Autopraisal" Height="278.225" Width="320.958" Background="#FF212121" WindowStyle="ToolWindow">
+        Title="Settings - Autopraisal v0.1d" Height="278.225" Width="320.958" Background="#FF212121" WindowStyle="ToolWindow">
     <Grid>
         <StackPanel Margin="10,10,10,10">
             <TextBlock Text="Mode" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold"/>
