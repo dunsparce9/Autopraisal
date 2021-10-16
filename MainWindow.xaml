@@ -10,11 +10,11 @@
         <Grid Margin="10,0,10,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock x:Name="tbItem" Text="2313137 x Bravish Runelite" HorizontalAlignment="Right" Foreground="White" FontSize="16" VerticalAlignment="Center" Margin="0,0,2,0"/>
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Center">
+                <WrapPanel x:Name="wpValue" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Center">
                     <Image Stretch="Fill" Source="Wallet.png" Height="24" Width="24" VerticalAlignment="Center" Margin="0,0,-2,0"/>
                     <TextBlock x:Name="tbPrice" FontWeight="Bold" Cursor="Hand" Text="420.690" Foreground="White" FontSize="16" VerticalAlignment="Center"/>
                 </WrapPanel>
-                <TextBlock x:Name="tbBottom" Text="Value copied" Foreground="#FF00FFA2" HorizontalAlignment="Right" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center"/>
+                <TextBlock x:Name="tbMessage" Text="Value copied" Foreground="Turquoise" HorizontalAlignment="Right" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center"/>
             </StackPanel >
         </Grid>
     </Grid>

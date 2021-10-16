@@ -6,11 +6,21 @@
         xmlns:local="clr-namespace:Autopraisal"
         xmlns:properties="clr-namespace:Autopraisal.Properties"
         mc:Ignorable="d"
-        Title="Settings - Autopraisal" Height="240" Width="289" Background="#FF212121" WindowStyle="ToolWindow">
+        Title="Settings - Autopraisal" Height="278.225" Width="320.958" Background="#FF212121" WindowStyle="ToolWindow">
     <Grid>
         <StackPanel Margin="10,10,10,10">
-            <TextBlock Text="Monitoring" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold"/>
-            <CheckBox IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=CheckForEve}" Content="Only appraise if EVE is in the foreground" Foreground="White" Margin="0,6,0,0"/>
+            <TextBlock Text="Mode" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold"/>
+            <RadioButton IsChecked="{Binding IsAuto}" x:Name="rbAuto" Foreground="White" Margin="0,6,0,0">
+                <TextBlock>
+                    <Bold>Auto:</Bold>  Appraise clipboard after items are copied
+                </TextBlock>
+            </RadioButton>
+            <CheckBox IsEnabled="{Binding ElementName=rbAuto, Path=IsChecked, TargetNullValue=false}" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=CheckForEve}" Content="Only appraise if EVE is in the foreground" Foreground="White" Margin="20,6,0,0"/>
+            <RadioButton IsChecked="{Binding IsManual}" x:Name="rbManual" Foreground="White" Margin="0,6,0,0">
+                <TextBlock>
+                    <Bold>Manual:</Bold>  Click the tray icon to appraise clipboard
+                </TextBlock>
+            </RadioButton>
             <TextBlock Text="Appraisals" Foreground="#FFFFC800" FontSize="14" FontWeight="Bold" Margin="0,16,0,0"/>
             <WrapPanel Margin="0,6,0,0">
                 <TextBlock Text="Pricing:" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>

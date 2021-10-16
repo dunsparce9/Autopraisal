@@ -21,6 +21,8 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Autopraisal
 {
@@ -42,7 +44,7 @@ namespace Autopraisal
 
             windowHandle = new WindowInteropHelper(this).EnsureHandle();
             HwndSource.FromHwnd(windowHandle)?.AddHook(HwndHandler);
-            Start();
+            if (Properties.Settings.Default.MonitoringEnabled) Start();
         }
 
         public static readonly DependencyProperty ClipboardUpdateCommandProperty =
@@ -112,6 +114,13 @@ namespace Autopraisal
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         List<EveItem> items = new List<EveItem>();
         string AppraisalCache = "";
+        string LastAppraisal = "";
+        string itemText = "";
+        bool ValueOutdated = false;
+        DispatcherTimer slideDownTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(4)
+        };
         List<string> ores = new List<string>{
             "Arkonor","Bezdacine","Bistot","Crokite","Dark Ochre","Gneiss",
             "Hedbergite","Hemorphite","Jaspet", "Kernite", "Mercoxit", "Omber",
@@ -130,7 +139,7 @@ namespace Autopraisal
         NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
         private string resultPrice;
         ContextMenuStrip contextMenu = new ContextMenuStrip();
-        ToolStripMenuItem enabled = new ToolStripMenuItem("Monitoring enabled");
+        ToolStripMenuItem enabled = new ToolStripMenuItem("Auto mode");
         ToolStripMenuItem settings = new ToolStripMenuItem("Settings");
         ToolStripMenuItem exit = new ToolStripMenuItem("Exit");
 
@@ -150,10 +159,13 @@ namespace Autopraisal
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.ContextMenuStrip = contextMenu;
             notifyIcon.Icon = Autopraisal.Properties.Resources.Wallet;
+            notifyIcon.MouseClick += NotifyIcon_MouseClick;
+            enabled.Checked = Properties.Settings.Default.MonitoringEnabled;
 
             slide.BeginTime = new TimeSpan(0);
             slide.SetValue(Storyboard.TargetProperty, mainGrid);
             Storyboard.SetTargetProperty(slide, new PropertyPath(MarginProperty));
+            slideDownTimer.Tick += SlideDownTimer_Tick;
 
             slide.From = new Thickness(0, 25, 0, 0);
             slide.To = new Thickness(0, 0, 0, 0);
@@ -164,14 +176,37 @@ namespace Autopraisal
 
         }
 
+        private void SlideDownTimer_Tick(object sender, EventArgs e)
+        {
+            Slide(false);
+            slideDownTimer.Stop();
+        }
+
+        private void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            string clipboardText = System.Windows.Clipboard.GetText();
+            if (clipboardText == resultPrice) return;
+            Appraise(clipboardText);
+        }
+
         private void Settings_Click(object sender, EventArgs e)
         {
             new Settings().ShowDialog();
+            ValueOutdated = true;
+            enabled.Checked = Properties.Settings.Default.MonitoringEnabled;
+            UpdateMonitoring();
         }
 
         private void Enabled_Click(object sender, EventArgs e)
         {
             enabled.Checked = !enabled.Checked;
+            Properties.Settings.Default.MonitoringEnabled = enabled.Checked;
+            UpdateMonitoring();
+        }
+
+        private void UpdateMonitoring()
+        {
             if (enabled.Checked)
             {
                 Start();
@@ -203,15 +238,32 @@ namespace Autopraisal
 
         void OnClipboardUpdate()
         {
-            string clipboardText = System.Windows.Clipboard.GetText();
-            if (clipboardText == resultPrice) return;
+            string clipboardText = "";
+            try
+            {
+                clipboardText = System.Windows.Clipboard.GetText();
+            }
+            catch
+            {
+                Notify("?", "Failed to fetch clipboard");
+                return;
+            }
+            if (clipboardText == resultPrice || clipboardText == "") return;
             Process p = GetActiveProcess();
             bool isEve = p.ProcessName == "exefile" && p.MainWindowTitle.StartsWith("EVE - ");
             if (!Properties.Settings.Default.CheckForEve | isEve)
             {
-                items.Clear();
-                AppraisalCache = "";
-                using (StringReader reader = new StringReader(clipboardText))
+                Appraise(clipboardText);
+            }
+        }
+
+        void Appraise(string text)
+        {
+            items.Clear();
+            AppraisalCache = "";
+            try
+            {
+                using (StringReader reader = new StringReader(text))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
@@ -236,10 +288,25 @@ namespace Autopraisal
                         AppraisalCache += name + "\t" + qty + "\n";
                     }
                 }
-                if (items.Count > 0)
+            }
+            catch (Exception e)
+            {
+                Notify("?", "Failed to parse");
+                return;
+            }
+            if (LastAppraisal == AppraisalCache && !ValueOutdated)
+            {
+                System.Windows.Clipboard.SetDataObject(resultPrice);
+                Notify(itemText, resultPrice, "Last value copied");
+                ValueOutdated = false;
+                return;
+            }
+            if (items.Count > 0)
+            {
+                itemText = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
+                try
                 {
-                    tbItem.Text = items.Count > 1 ? "(multiple items)" : items[0].Quantity.ToString() + " x " + items[0].Name;
-                    var result = Appraise(AppraisalCache);
+                    var result = GetAppraisal(AppraisalCache);
                     if (Properties.Settings.Default.Price == 0)
                     {
                         resultPrice = result.appraisal.totals.buy.ToString("N");
@@ -248,69 +315,101 @@ namespace Autopraisal
                     {
                         resultPrice = result.appraisal.totals.sell.ToString("N");
                     }
-                    tbPrice.Text = resultPrice;
                     System.Windows.Clipboard.SetDataObject(resultPrice);
-                    Visibility = Visibility.Visible;
-                    UpdateLayout();
-                    Rect desktopWorkingArea = SystemParameters.WorkArea;
-                    Left = desktopWorkingArea.Right - Width;
-                    Top = desktopWorkingArea.Bottom - Height;
-                    Slide(true);
-                    Task.Delay(4000).ContinueWith(_ =>
-                    {
-                        Slide(false);
-                    });
+                    Notify(itemText, resultPrice, "Value copied");
+                    ValueOutdated = false;
+                    LastAppraisal = AppraisalCache;
+                }
+                catch (Exception e)
+                {
+                    Notify(itemText, "Appraisal failed");
+                    return;
                 }
             }
-
-            Result Appraise(string text)
-            {
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://evepraisal.com/appraisal.json?persist=no");
-                httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
-                outgoingQueryString.Clear();
-                outgoingQueryString.Add("market", markets[Properties.Settings.Default.Market].ToLowerInvariant());
-                outgoingQueryString.Add("price_percentage", Properties.Settings.Default.Percentage.ToString());
-                outgoingQueryString.Set("raw_textarea", text);
-                string postdata = outgoingQueryString.ToString();
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(postdata);
-                }
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    string response = streamReader.ReadToEnd();
-                    return JsonConvert.DeserializeObject<Result>(response);
-                }
-            }
-
-            void Slide(bool up)
-            {
-                SlidingDown = !up;
-                if (up)
-                {
-                    App.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        slide.From = new Thickness(0, 25, 0, 0);
-                        slide.To = new Thickness(0, 0, 0, 0);
-                        sb.Begin();
-                    });
-                }
-                else
-                {
-                    App.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        slide.From = new Thickness(0, 0, 0, 0);
-                        slide.To = new Thickness(0, 25, 0, 0);
-                        sb.Begin();
-                    });
-                }
-            }
-
         }
 
+        void Notify(string item, string message)
+        {
+            tbItem.Text = item;
+            tbMessage.Text = message;
+            tbMessage.Foreground = new SolidColorBrush(Colors.Gold);
+            wpValue.Visibility = Visibility.Collapsed;
+            SlideUp();
+        }
+
+        void Notify(string item, string price, string message)
+        {
+            tbItem.Text = item;
+            tbPrice.Text = price;
+            tbMessage.Text = message;
+            tbMessage.Foreground = new SolidColorBrush(Colors.Turquoise);
+            wpValue.Visibility = Visibility.Visible;
+            SlideUp();
+        }
+
+        void SlideUp()
+        {
+            Visibility = Visibility.Visible;
+            UpdateLayout();
+            Rect desktopWorkingArea = SystemParameters.WorkArea;
+            Left = desktopWorkingArea.Right - Width;
+            Top = desktopWorkingArea.Bottom - Height;
+            if (slideDownTimer.IsEnabled)
+            {
+                slideDownTimer.Stop();
+                slideDownTimer.Start();
+            }
+            else
+            {
+                Slide(true);
+                slideDownTimer.Start();
+            }
+        }
+
+        Result GetAppraisal(string text)
+        {
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://evepraisal.com/appraisal.json?persist=no");
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.UserAgent = "Autopraisal/0.1a (github.com/dunsparce9/autopraisal)";
+            outgoingQueryString.Clear();
+            outgoingQueryString.Add("market", markets[Properties.Settings.Default.Market].ToLowerInvariant());
+            outgoingQueryString.Add("price_percentage", Properties.Settings.Default.Percentage.ToString());
+            outgoingQueryString.Set("raw_textarea", text);
+            string postdata = outgoingQueryString.ToString();
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                streamWriter.Write(postdata);
+            }
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                string response = streamReader.ReadToEnd();
+                return JsonConvert.DeserializeObject<Result>(response);
+            }
+        }
+        void Slide(bool up)
+        {
+            SlidingDown = !up;
+            if (up)
+            {
+                App.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    slide.From = new Thickness(0, 25, 0, 0);
+                    slide.To = new Thickness(0, 0, 0, 0);
+                    sb.Begin();
+                });
+            }
+            else
+            {
+                App.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    slide.From = new Thickness(0, 0, 0, 0);
+                    slide.To = new Thickness(0, 25, 0, 0);
+                    sb.Begin();
+                });
+            }
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             notifyIcon.Visible = true;

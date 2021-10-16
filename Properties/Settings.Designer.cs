@@ -82,5 +82,17 @@ namespace Autopraisal.Properties {
                 this["Price"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MonitoringEnabled {
+            get {
+                return ((bool)(this["MonitoringEnabled"]));
+            }
+            set {
+                this["MonitoringEnabled"] = value;
+            }
+        }
     }
 }

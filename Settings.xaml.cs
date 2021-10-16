@@ -19,6 +19,16 @@ namespace Autopraisal
     /// </summary>
     public partial class Settings : Window
     {
+        public bool IsAuto
+        {
+            get => Properties.Settings.Default.MonitoringEnabled;
+            set => Properties.Settings.Default.MonitoringEnabled = value;
+        }
+        public bool IsManual
+        {
+            get => !Properties.Settings.Default.MonitoringEnabled;
+            set => Properties.Settings.Default.MonitoringEnabled = !value;
+        }
         public List<string> markets { get; set; } = new List<string> { "Jita", "Perimeter", "Universe", "Amarr", "Dodixie", "Hek", "Rens" };
         public Settings()
         {
