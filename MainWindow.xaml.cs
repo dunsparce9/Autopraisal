@@ -270,7 +270,7 @@ namespace Autopraisal
                     {
                         string name = itemName.Match(line).Value;
                         int qty = int.Parse(itemQty.Match(line).Value.Trim());
-                        if (Properties.Settings.Default.CompressOres)
+                        if (Properties.Settings.Default.CompressOres && !name.StartsWith("Compressed "))
                         {
                             if (ores.Any(s => name.EndsWith(s)) && qty / 100 >= 1)
                             {
