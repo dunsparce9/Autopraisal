@@ -113,9 +113,8 @@ namespace Autopraisal
         #endregion
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         List<EveItem> items = new List<EveItem>();
-        string AppraisalCache = "";
-        string LastAppraisal = "";
-        string itemText = "";
+        string LastAppraisal;
+        string itemText;
         bool ValueOutdated = false;
         DispatcherTimer slideDownTimer = new DispatcherTimer
         {
@@ -260,7 +259,7 @@ namespace Autopraisal
         void Appraise(string text)
         {
             items.Clear();
-            AppraisalCache = "";
+            string AppraisalCache = "";
             try
             {
                 using (StringReader reader = new StringReader(text))
@@ -289,12 +288,12 @@ namespace Autopraisal
                     }
                 }
             }
-            catch (DivideByZeroException e)
+            catch (Exception e)
             {
                 Notify("?", "Failed to parse");
                 return;
             }
-            if (LastAppraisal == AppraisalCache && !ValueOutdated)
+            if (!string.IsNullOrEmpty(AppraisalCache) && LastAppraisal == AppraisalCache && !ValueOutdated)
             {
                 System.Windows.Clipboard.SetDataObject(resultPrice);
                 Notify(itemText, resultPrice, "Last value copied");
