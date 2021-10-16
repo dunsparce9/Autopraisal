@@ -269,7 +269,7 @@ namespace Autopraisal
                     while ((line = reader.ReadLine()) != null)
                     {
                         string name = itemName.Match(line).Value;
-                        int qty = int.Parse(itemQty.Match(line).Value.Trim());
+                        int qty = int.Parse(itemQty.Match(line).Value.Trim().Replace(".",""));
                         if (Properties.Settings.Default.CompressOres && !name.StartsWith("Compressed "))
                         {
                             if (ores.Any(s => name.EndsWith(s)) && qty / 100 >= 1)
@@ -289,7 +289,7 @@ namespace Autopraisal
                     }
                 }
             }
-            catch (Exception e)
+            catch (DivideByZeroException e)
             {
                 Notify("?", "Failed to parse");
                 return;
