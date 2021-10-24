@@ -159,6 +159,7 @@ namespace Autopraisal
             notifyIcon.ContextMenuStrip = contextMenu;
             notifyIcon.Icon = Autopraisal.Properties.Resources.Wallet;
             notifyIcon.MouseClick += NotifyIcon_MouseClick;
+            notifyIcon.Text = "Autopraisal " + Properties.Settings.Default.Version + " - Running";
             enabled.Checked = Properties.Settings.Default.MonitoringEnabled;
 
             slide.BeginTime = new TimeSpan(0);
