@@ -37,7 +37,7 @@ namespace Autopraisal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CompressOres {
             get {
                 return ((bool)(this["CompressOres"]));
@@ -49,7 +49,7 @@ namespace Autopraisal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public int Percentage {
             get {
                 return ((int)(this["Percentage"]));
@@ -92,6 +92,15 @@ namespace Autopraisal.Properties {
             }
             set {
                 this["MonitoringEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("v0.2")]
+        public string Version {
+            get {
+                return ((string)(this["Version"]));
             }
         }
     }
