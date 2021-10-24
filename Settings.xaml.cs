@@ -37,6 +37,8 @@ namespace Autopraisal
             Left = desktopWorkingArea.Right - Width;
             Top = desktopWorkingArea.Bottom - Height;
             DataContext = this;
+            Title = "Settings - Autopraisal " + Properties.Settings.Default.Version;
+            tbVersion.Text = "Autopraisal " + Properties.Settings.Default.Version;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
